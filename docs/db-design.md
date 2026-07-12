@@ -16,6 +16,8 @@ The initial database model focuses on the identity domain.
 
 ---
 
+
+
 # Identity Domain
 
 The identity domain is responsible for representing users, their identities, and the different ways they can authenticate.
