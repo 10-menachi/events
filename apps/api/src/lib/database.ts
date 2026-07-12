@@ -1,7 +1,8 @@
+import logger from "./logger";
 import prisma from "./prisma";
 
 export async function connectDatabase() {
     await prisma.$connect();
 
-    console.log("Database connected");
+    logger.info("Database connected");
 }

@@ -140,6 +140,7 @@ Future iterations may introduce:
 - [ADR 004: Organize Layers by Domain](docs/decisions/004-organize-layers-by-domain.md)
 - [ADR 005: Keep Business Logic in Services](docs/decisions/005-keep-business-logic-in-services.md)
 - [ADR 006: Validate Requests Before Business Logic](docs/decisions/006-validate-requests-before-business-logic.md)
+- [ADR 007: Use Structured Logging](docs/decisions/007-structured-logging.md)
 
 ---
 
