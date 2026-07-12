@@ -9,6 +9,7 @@ erDiagram
         string username
         string avatar_url
         datetime created_at
+        datetime deleted_at
         datetime updated_at
     }
 
