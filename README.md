@@ -136,6 +136,10 @@ Future iterations may introduce:
 
 - [ADR 001: Use PostgreSQL](docs/decisions/001-use-postgres.md)
 - [ADR 002: Use UUID Primary Keys](docs/decisions/002-use-uuid-primary-keys.md)
+- [ADR 003: Use Layer-Based Architecture](docs/decisions/003-use-layer-based-architecture.md)
+- [ADR 004: Organize Layers by Domain](docs/decisions/004-organize-layers-by-domain.md)
+- [ADR 005: Keep Business Logic in Services](docs/decisions/005-keep-business-logic-in-services.md)
+- [ADR 006: Validate Requests Before Business Logic](docs/decisions/006-validate-requests-before-business-logic.md)
 
 ---
 
