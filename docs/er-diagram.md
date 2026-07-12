@@ -13,13 +13,32 @@ erDiagram
         datetime updated_at
     }
 
-    PASSWORD_CREDENTIAL {
+    EMAIL_IDENTITY {
         uuid id PK
         uuid user_id FK
         string email
-        string password_hash
+        boolean is_primary
         datetime verified_at
         datetime created_at
+        datetime updated_at
+    }
+
+    PHONE_IDENTITY {
+        uuid id PK
+        uuid user_id FK
+        string phone_number
+        boolean is_primary
+        datetime verified_at
+        datetime created_at
+        datetime updated_at
+    }
+
+    PASSWORD_CREDENTIAL {
+        uuid id PK
+        uuid email_identity_id FK
+        string password_hash
+        datetime created_at
+        datetime updated_at
     }
 
     OAUTH_ACCOUNT {
@@ -28,19 +47,12 @@ erDiagram
         string provider
         string provider_account_id
         datetime created_at
-    }
-
-    PHONE_CREDENTIAL {
-        uuid id PK
-        uuid user_id FK
-        string phone_number
-        datetime verified_at
-        datetime created_at
+        datetime updated_at
     }
 
     OTP_VERIFICATION {
         uuid id PK
-        string phone_number
+        uuid phone_identity_id FK
         string code_hash
         datetime expires_at
         datetime verified_at
@@ -53,12 +65,16 @@ erDiagram
         string token_hash
         datetime expires_at
         datetime created_at
+        datetime updated_at
     }
 
-    USER ||--o| PASSWORD_CREDENTIAL : has
     USER ||--o{ OAUTH_ACCOUNT : has
-    USER ||--o| PHONE_CREDENTIAL : has
     USER ||--o{ SESSION : creates
 
-    PHONE_CREDENTIAL ||--o{ OTP_VERIFICATION : verifies
+    USER ||--o{ EMAIL_IDENTITY : owns
+    USER ||--o{ PHONE_IDENTITY : owns
+
+    EMAIL_IDENTITY ||--o| PASSWORD_CREDENTIAL : has
+
+    PHONE_IDENTITY ||--o{ OTP_VERIFICATION : has
 ```
