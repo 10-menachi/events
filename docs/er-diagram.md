@@ -1,4 +1,6 @@
+# Entity Relationship Diagram
 
+```mermaid
 erDiagram
 
     USER {
@@ -52,9 +54,10 @@ erDiagram
         datetime created_at
     }
 
-    USER || --o PASSWORD_CREDENTIAL : has
-    USER || --o OAUTH_ACCOUNT : has
-    USER || --o PHONE_CREDENTIAL : has
-    USER || --o SESSION : creates
+    USER ||--o| PASSWORD_CREDENTIAL : has
+    USER ||--o{ OAUTH_ACCOUNT : has
+    USER ||--o| PHONE_CREDENTIAL : has
+    USER ||--o{ SESSION : creates
 
-    PHONE_CREDENTIAL || --o{ OTP_VERIFICATION : verifies
+    PHONE_CREDENTIAL ||--o{ OTP_VERIFICATION : verifies
+```
