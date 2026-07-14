@@ -7,6 +7,8 @@
     "dev": "bun --watch src/server.ts",
     "start": "bun src/server.ts",
     "build": "tsc",
+    "test:dev": "vitest",
+    "test:prod": "vitest run",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:format": "prisma format",
@@ -18,7 +20,10 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.1.1"
+    "@types/node": "^26.1.1",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "typescript": "^7.0.2"
