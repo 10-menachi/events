@@ -9,6 +9,7 @@
     "build": "tsc",
     "test:dev": "vitest",
     "test:prod": "vitest run",
+    "db:test:deploy": "bun --env-file=.env.test prisma migrate deploy",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:format": "prisma format",
