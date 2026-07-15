@@ -1,3 +1,4 @@
+import ConflictError from "../../errors/conflict.error";
 import prisma from "../../lib/prisma";
 import { hashPassword } from "../../providers/auth/password.provider";
 import type { RegistrationInput } from "../../validators/auth/registration.validator";
@@ -10,7 +11,7 @@ export default async function registerUserService(input: RegistrationInput) {
   });
 
   if (existingEmailIdentity) {
-    throw new Error("Email already exists");
+    throw new ConflictError("EMAIL_ALREADY_EXISTS", "Email already exists");
   }
 
   const hashedPassword = await hashPassword(input.password);
