@@ -1,7 +1,7 @@
 import ConflictError from "../../errors/conflict.error";
 import prisma from "../../lib/prisma";
 import { hashPassword } from "../../providers/auth/password.provider";
-import type { RegistrationInput } from "../../validators/auth/registration.validator";
+import type { RegistrationInput } from "../../schemas/auth/registration.schema";
 
 export default async function registerUserService(input: RegistrationInput) {
   const existingEmailIdentity = await prisma.emailIdentity.findUnique({
