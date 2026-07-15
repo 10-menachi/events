@@ -3,12 +3,16 @@ import z from "zod";
 const registrationSchema = z
   .object({
     fullName: z
-      .string()
+      .string({
+        error: "Full name is required",
+      })
       .trim()
       .min(2, "Full name should be at least 2 characters long")
       .max(100, "Full name should not exceed 100 characters"),
     email: z
-      .string()
+      .string({
+        error: "Email is required",
+      })
       .trim()
       .toLowerCase()
       .pipe(z.email("Invalid email address")),
