@@ -19,4 +19,21 @@ describe("Registration Tests", () => {
 
     expect(response.body).toHaveProperty("email", payload.email);
   });
+
+  it("should reject registrtion when email already exists", async () => {
+    const payload = testRegistrationPayload();
+
+    await request(app).post("/api/auth/register").send(payload);
+
+    const response = await request(app)
+      .post("/api/auth/register")
+      .send(payload);
+
+    expect(response.status).toBe(409);
+
+    expect(response.body).toEqual({
+      code: "EMAIL_ALREADY_EXISTS",
+      message: "Email already exists",
+    });
+  });
 });
