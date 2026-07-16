@@ -1,6 +1,6 @@
 import z from "zod";
 
-const registrationSchema = z
+export const registrationSchema = z
   .object({
     fullName: z
       .string({
@@ -31,4 +31,3 @@ const registrationSchema = z
   });
 
 export type RegistrationInput = z.infer<typeof registrationSchema>;
-export default registrationSchema;
