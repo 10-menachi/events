@@ -7,8 +7,8 @@ import { resetDatabase } from "../../setup/database";
 const validRegistrationPayload = {
   fullName: "Wamalwa Christian Timbe",
   email: "timbe@example.com",
-  password: "Christian2002",
-  passwordConfirmation: "Christian2002",
+  password: "password123",
+  passwordConfirmation: "password123",
 };
 
 beforeEach(async () => {
@@ -186,5 +186,22 @@ describe("Registration Tests", () => {
         },
       ]),
     );
+  });
+
+  it("should reject registration when email already exists", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send(validRegistrationPayload);
+
+    const response = await request(app)
+      .post("/api/auth/register")
+      .send(validRegistrationPayload);
+
+    expect(response.status).toBe(409);
+
+    expect(response.body).toEqual({
+      code: "EMAIL_ALREADY_EXISTS",
+      message: "Email already exists",
+    });
   });
 });
