@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import app from "../../../src/app";
 import request from "supertest";
 import { testRegistrationPayload } from "../../../src/lib/utils/helpers";
+import { resetDatabase } from "../../setup/database";
 
 const validRegistrationPayload = {
   fullName: "Wamalwa Christian Timbe",
@@ -9,6 +10,10 @@ const validRegistrationPayload = {
   password: "Christian2002",
   passwordConfirmation: "Christian2002",
 };
+
+beforeEach(async () => {
+  await resetDatabase();
+});
 
 describe("Registration Tests", () => {
   it("should register a new user successfully provided a valid request", async () => {
@@ -126,6 +131,39 @@ describe("Registration Tests", () => {
 
     expect(response.status).toBe(400);
 
+    expect(response.body.code).toBe("VALIDATION_ERROR");
+
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        {
+          path: "fullName",
+          message: "Full name should be at least 2 characters long",
+        },
+        {
+          path: "email",
+          message: "Invalid email address",
+        },
+        {
+          path: "password",
+          message: "Password must be at least 8 characters long",
+        },
+        {
+          path: "passwordConfirmation",
+          message: "Password confirmation must be at least 8 characters long",
+        },
+      ]),
+    );
+  });
+
+  it("should reject registration when required fields are empty", async () => {
+    const response = await request(app).post("/api/auth/register").send({
+      fullName: "",
+      email: "",
+      password: "",
+      passwordConfirmation: "",
+    });
+
+    expect(response.status).toBe(400);
     expect(response.body.code).toBe("VALIDATION_ERROR");
 
     expect(response.body.errors).toEqual(
