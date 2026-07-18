@@ -33,4 +33,51 @@ describe("Registration Tests", () => {
       email: validRegistrationPayload.email,
     });
   });
+
+  it("should reject login with invalid credentials", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send(validRegistrationPayload);
+
+    const response = await request(app).post("/api/auth/login").send({
+      email: validRegistrationPayload.email,
+      password: "wrongpassword",
+    });
+
+    expect(response.status).toBe(401);
+
+    expect(response.body).toEqual({
+      code: "INVALID_CREDENTIALS",
+      message: "Invalid email or password",
+    });
+  });
+
+  it("should reject login for unregistered users", async () => {
+    const response = await request(app).post("/api/auth/login").send({
+      email: "unregistered@example.com",
+      password: "password123",
+    });
+
+    expect(response.status).toBe(401);
+
+    expect(response.body).toEqual({
+      code: "INVALID_CREDENTIALS",
+      message: "Invalid email or password",
+    });
+  });
+
+  it("should reject login with missing fields", async () => {
+    const response = await request(app).post("/api/auth/login").send({
+      email: validRegistrationPayload.email,
+    });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body.code).toBe("VALIDATION_ERROR");
+
+    expect(response.body.errors).toContainEqual({
+      path: "password",
+      message: "Password is required",
+    });
+  });
 });
