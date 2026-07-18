@@ -16,8 +16,6 @@ The initial database model focuses on the identity domain.
 
 ---
 
-
-
 # Identity Domain
 
 The identity domain is responsible for representing users, their identities, and the different ways they can authenticate.
@@ -55,14 +53,14 @@ A user contains profile information and acts as the parent entity for identities
 
 Current attributes:
 
-| Field | Purpose |
-| --- | --- |
-| id | Unique identifier for the user |
-| full_name | User's display name |
-| username | Optional public identifier |
-| avatar_url | Profile image reference |
-| created_at | Account creation timestamp |
-| updated_at | Last update timestamp |
+| Field      | Purpose                                        |
+| ---------- | ---------------------------------------------- |
+| id         | Unique identifier for the user                 |
+| full_name  | User's display name                            |
+| username   | Optional public identifier                     |
+| avatar_url | Profile image reference                        |
+| created_at | Account creation timestamp                     |
+| updated_at | Last update timestamp                          |
 | deleted_at | Indicates whether the account has been deleted |
 
 ---
@@ -88,15 +86,15 @@ User
 
 Current attributes:
 
-| Field | Purpose |
-| --- | --- |
-| id | Unique identifier for the email identity |
-| user_id | User who owns the identity |
-| email | Email address |
-| is_primary | Indicates the default email identity |
-| verified_at | Email verification timestamp |
-| created_at | Identity creation timestamp |
-| updated_at | Last update timestamp |
+| Field       | Purpose                                  |
+| ----------- | ---------------------------------------- |
+| id          | Unique identifier for the email identity |
+| user_id     | User who owns the identity               |
+| email       | Email address                            |
+| is_primary  | Indicates the default email identity     |
+| verified_at | Email verification timestamp             |
+| created_at  | Identity creation timestamp              |
+| updated_at  | Last update timestamp                    |
 
 ---
 
@@ -119,15 +117,15 @@ User
 
 Current attributes:
 
-| Field | Purpose |
-| --- | --- |
-| id | Unique identifier for the phone identity |
-| user_id | User who owns the identity |
-| phone_number | Phone number |
-| is_primary | Indicates the default phone identity |
-| verified_at | Phone verification timestamp |
-| created_at | Identity creation timestamp |
-| updated_at | Last update timestamp |
+| Field        | Purpose                                  |
+| ------------ | ---------------------------------------- |
+| id           | Unique identifier for the phone identity |
+| user_id      | User who owns the identity               |
+| phone_number | Phone number                             |
+| is_primary   | Indicates the default phone identity     |
+| verified_at  | Phone verification timestamp             |
+| created_at   | Identity creation timestamp              |
+| updated_at   | Last update timestamp                    |
 
 ---
 
@@ -157,13 +155,13 @@ PASSWORD_CREDENTIAL
 
 Current attributes:
 
-| Field | Purpose |
-| --- | --- |
-| id | Unique identifier |
+| Field             | Purpose                                     |
+| ----------------- | ------------------------------------------- |
+| id                | Unique identifier                           |
 | email_identity_id | Email identity associated with the password |
-| password_hash | Securely stored password hash |
-| created_at | Credential creation timestamp |
-| updated_at | Last update timestamp |
+| password_hash     | Securely stored password hash               |
+| created_at        | Credential creation timestamp               |
+| updated_at        | Last update timestamp                       |
 
 ---
 
@@ -190,14 +188,14 @@ OTP_VERIFICATION
 
 Current attributes:
 
-| Field | Purpose |
-| --- | --- |
-| id | Unique identifier |
-| phone_identity_id | Phone identity being verified |
-| code_hash | Securely stored OTP hash |
-| expires_at | OTP expiration timestamp |
-| verified_at | Successful verification timestamp |
-| created_at | Verification attempt timestamp |
+| Field             | Purpose                           |
+| ----------------- | --------------------------------- |
+| id                | Unique identifier                 |
+| phone_identity_id | Phone identity being verified     |
+| code_hash         | Securely stored OTP hash          |
+| expires_at        | OTP expiration timestamp          |
+| verified_at       | Successful verification timestamp |
+| created_at        | Verification attempt timestamp    |
 
 ---
 
@@ -225,14 +223,14 @@ USER
 
 Current attributes:
 
-| Field | Purpose |
-| --- | --- |
-| id | Unique identifier |
-| user_id | User linked to the provider account |
-| provider | OAuth provider name |
+| Field               | Purpose                              |
+| ------------------- | ------------------------------------ |
+| id                  | Unique identifier                    |
+| user_id             | User linked to the provider account  |
+| provider            | OAuth provider name                  |
 | provider_account_id | Provider-specific account identifier |
-| created_at | Account creation timestamp |
-| updated_at | Last update timestamp |
+| created_at          | Account creation timestamp           |
+| updated_at          | Last update timestamp                |
 
 ---
 
@@ -240,7 +238,7 @@ Current attributes:
 
 The `SESSION` entity represents authenticated sessions.
 
-Sessions are independent from authentication methods.
+Sessions are independent from authentication methods and track user authentication across different devices and applications.
 
 A user may have multiple active sessions across:
 
@@ -248,29 +246,87 @@ A user may have multiple active sessions across:
 - Mobile applications
 - CLI tools
 
-Example:
+Sessions record metadata about the device and connection, enabling:
+
+- Per-device session management
+- Security monitoring
+- User activity tracking
+
+Relationship:
 
 ```
 USER
+ |
+ |
+SESSION
+ |
+ |
+REFRESH_TOKEN
+```
+
+Example:
+
+```
+User
 
  |
- +-- Browser Session
+ +-- Browser Session (Chrome, MacBook)
+ |    |
+ |    +-- Refresh Token
  |
- +-- Mobile Session
- |
- +-- CLI Session
+ +-- Mobile Session (Safari, iPhone)
+      |
+      +-- Refresh Token
 ```
 
 Current attributes:
 
-| Field | Purpose |
-| --- | --- |
-| id | Unique identifier |
-| user_id | User who owns the session |
-| token_hash | Secure session token hash |
-| expires_at | Session expiration timestamp |
-| created_at | Session creation timestamp |
-| updated_at | Last update timestamp |
+| Field          | Purpose                                                 |
+| -------------- | ------------------------------------------------------- |
+| id             | Unique identifier for the session                       |
+| user_id        | User who owns the session                               |
+| device_name    | Optional name of the device (e.g., "Chrome on MacBook") |
+| user_agent     | Browser/client user agent string                        |
+| ip_address     | IP address of the client                                |
+| last_active_at | Timestamp of the last activity in this session          |
+| created_at     | Session creation timestamp                              |
+| updated_at     | Last update timestamp                                   |
+| revoked_at     | Session revocation timestamp (if revoked)               |
+
+---
+
+# Refresh Tokens
+
+The `REFRESH_TOKEN` entity represents long-lived tokens used to obtain new access tokens.
+
+Refresh tokens are associated with sessions, allowing:
+
+- Token rotation strategies
+- Per-session token management
+- Granular revocation control
+
+A session may have multiple refresh tokens over its lifetime if tokens are rotated.
+
+Relationship:
+
+```
+SESSION
+ |
+ |
+REFRESH_TOKEN
+```
+
+Current attributes:
+
+| Field      | Purpose                                 |
+| ---------- | --------------------------------------- |
+| id         | Unique identifier for the refresh token |
+| session_id | Session associated with this token      |
+| token_hash | Secure hash of the refresh token        |
+| expires_at | Token expiration timestamp              |
+| created_at | Token creation timestamp                |
+| updated_at | Last update timestamp                   |
+| revoked_at | Token revocation timestamp (if revoked) |
 
 ---
 

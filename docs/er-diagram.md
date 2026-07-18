@@ -62,14 +62,28 @@ erDiagram
     SESSION {
         uuid id PK
         uuid user_id FK
+        string device_name
+        string user_agent
+        string ip_address
+        datetime last_active_at
+        datetime created_at
+        datetime updated_at
+        datetime revoked_at
+    }
+
+    REFRESH_TOKEN {
+        uuid id PK
+        uuid session_id FK
         string token_hash
         datetime expires_at
         datetime created_at
         datetime updated_at
+        datetime revoked_at
     }
 
     USER ||--o{ OAUTH_ACCOUNT : has
-    USER ||--o{ SESSION : creates
+    USER ||--o{ SESSION : has
+    SESSION ||--o{ REFRESH_TOKEN : owns
 
     USER ||--o{ EMAIL_IDENTITY : owns
     USER ||--o{ PHONE_IDENTITY : owns
