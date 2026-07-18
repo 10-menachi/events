@@ -8,7 +8,11 @@ export const loginSchema = z.object({
     .trim()
     .toLowerCase()
     .pipe(z.email("Invalid email address")),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
+  password: z
+    .string({
+      error: "Password is required",
+    })
+    .min(8, "Password must be at least 8 characters long"),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

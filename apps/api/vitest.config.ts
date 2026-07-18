@@ -13,5 +13,6 @@ export default defineConfig({
       NODE_ENV: "test",
       DATABASE_URL: process.env.DATABASE_URL ?? "",
     },
+    maxWorkers: 1,
   },
 });
