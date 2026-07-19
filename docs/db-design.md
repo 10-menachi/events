@@ -12,7 +12,9 @@ The database design prioritizes:
 - Extensibility
 - Separation of concerns
 
-The initial database model focuses on the identity domain.
+The initial database model focuses on the identity domain and the session/refresh-token storage needed for JWT-based authentication.
+
+This design assumes access tokens are JWTs that are not persisted in the database, while opaque refresh tokens are stored as hashed values and linked to sessions.
 
 ---
 
@@ -240,6 +242,8 @@ The `SESSION` entity represents authenticated sessions.
 
 Sessions are independent from authentication methods and track user authentication across different devices and applications.
 
+Sessions are used by the authentication flow to validate active authentication state and to support refresh-token based token renewal and revocation.
+
 A user may have multiple active sessions across:
 
 - Web applications
@@ -297,7 +301,9 @@ Current attributes:
 
 # Refresh Tokens
 
-The `REFRESH_TOKEN` entity represents long-lived tokens used to obtain new access tokens.
+The `REFRESH_TOKEN` entity represents long-lived opaque tokens used to obtain new access tokens.
+
+Refresh tokens are stored as hashed values in the database so plaintext tokens are never persisted.
 
 Refresh tokens are associated with sessions, allowing:
 

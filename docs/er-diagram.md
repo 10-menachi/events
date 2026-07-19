@@ -3,6 +3,9 @@
 ```mermaid
 erDiagram
 
+    %% Authentication uses JWT access tokens that are not stored in the database,
+    %% and opaque refresh tokens that are stored hashed and linked to sessions.
+
     USER {
         uuid id PK
         string full_name
