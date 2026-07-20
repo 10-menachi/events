@@ -7,11 +7,14 @@ export default async function loginUserController(
   next: NextFunction,
 ) {
   try {
-    const { user, emailIdentity } = await loginUserService(req.body);
+    const { user, emailIdentity, accessToken, refreshTokenHash } =
+      await loginUserService(req.body);
     return res.status(200).json({
       id: user.id,
       fullName: user.fullName,
       email: emailIdentity.email,
+      accessToken,
+      refreshToken: refreshTokenHash,
     });
   } catch (error) {
     next(error);

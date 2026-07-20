@@ -5,16 +5,16 @@ import { hashPassword } from "../../../providers/auth/password.provider";
 import { daysFromNow } from "../../../lib/utils/helpers";
 
 export async function generateRefreshToken(sessionId: string) {
-  const tokenHash = randomBytes(64).toString("hex");
-  const hashedTokenHash = await hashPassword(tokenHash);
+  const refreshToken = randomBytes(64).toString("hex");
+  const refreshTokenHash = await hashPassword(refreshToken);
 
   await prisma.refreshToken.create({
     data: {
       sessionId,
-      tokenHash: hashedTokenHash,
+      tokenHash: refreshTokenHash,
       expiresAt: daysFromNow(Number(env.refreshTokenExpiry)),
     },
   });
 
-  return tokenHash;
+  return refreshToken;
 }

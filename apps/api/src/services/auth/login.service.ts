@@ -2,6 +2,9 @@ import { InvalidCredentialsError } from "../../errors/auth.errors";
 import prisma from "../../lib/prisma";
 import { verifyPassword } from "../../providers/auth/password.provider";
 import type { LoginInput } from "../../schemas/auth/login.schema";
+import generateAccessToken from "./access_token/generate.service";
+import { generateRefreshToken } from "./refresh_token/generate.service";
+import createSessionService from "./session/create.service";
 
 export default async function loginUserService(input: LoginInput) {
   const existingEmailIdentity = await prisma.emailIdentity.findUnique({
@@ -43,5 +46,16 @@ export default async function loginUserService(input: LoginInput) {
     throw new InvalidCredentialsError();
   }
 
-  return { user, emailIdentity: existingEmailIdentity };
+  const session = await createSessionService(user.id);
+
+  const refreshTokenHash = await generateRefreshToken(session.id);
+
+  const accessToken = await generateAccessToken(user.id, session.id);
+
+  return {
+    user,
+    emailIdentity: existingEmailIdentity,
+    refreshTokenHash,
+    accessToken,
+  };
 }
