@@ -142,6 +142,7 @@ Future iterations may introduce:
 - [ADR 006: Validate Requests Before Business Logic](docs/decisions/006-validate-requests-before-business-logic.md)
 - [ADR 007: Use Structured Logging](docs/decisions/007-structured-logging.md)
 - [ADR 008: Request Correlation IDs](docs/decisions/008-request-correlation-ids.md)
+- [ADR 009: Request Correlation IDs](docs/decisions/009-authentication-strategy.md)
 
 ---
 
