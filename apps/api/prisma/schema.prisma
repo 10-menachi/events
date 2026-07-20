@@ -73,12 +73,12 @@ model OAuthAccount {
 }
 
 model Session {
-  id         String  @id @default(uuid())
-  userId     String  @map("user_id")
-  deviceName String? @map("device_name")
-  userAgent  String? @map("user_agent")
-  ipAddress  String? @map("ip_address")
-
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  deviceName   String?   @map("device_name")
+  userAgent    String?   @map("user_agent")
+  ipAddress    String?   @map("ip_address")
+  expiresAt    DateTime  @map("expires_at")
   createdAt    DateTime  @default(now()) @map("created_at")
   lastActiveAt DateTime? @map("last_active_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
