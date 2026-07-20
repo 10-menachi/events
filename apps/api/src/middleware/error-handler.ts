@@ -2,7 +2,8 @@ import type { Request, Response, NextFunction } from "express";
 import logger from "../lib/logger";
 import AppError from "../errors/app.error";
 import { ZodError } from "zod";
-import { JWTExpired } from "jose/errors";
+import { JWSSignatureVerificationFailed, JWTExpired } from "jose/errors";
+import UnauthorizedError from "../errors/unauthorized.error";
 
 export function errorHandler(
   err: Error,
@@ -35,6 +36,10 @@ export function errorHandler(
       code: "TOKEN_EXPIRED",
       message: "Your session has expired",
     });
+  }
+
+  if (err instanceof JWSSignatureVerificationFailed) {
+    throw new UnauthorizedError();
   }
 
   return res.status(500).json({
