@@ -9,12 +9,19 @@ export default async function loginUserController(
   try {
     const { user, emailIdentity, accessToken, refreshTokenHash } =
       await loginUserService(req.body);
+
+    res.cookie("refreshToken", refreshTokenHash, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
     return res.status(200).json({
       id: user.id,
       fullName: user.fullName,
       email: emailIdentity.email,
       accessToken,
-      refreshToken: refreshTokenHash,
     });
   } catch (error) {
     next(error);
