@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import UnauthorizedError from "../errors/unauthorized.error";
 import verifyAccessToken from "../services/auth/access_token/verify.service";
-import logger from "../lib/logger";
 import prisma from "../lib/prisma";
 
 export default async function authMiddleware(
@@ -13,35 +12,23 @@ export default async function authMiddleware(
     const authorization = req.headers.authorization;
 
     if (!authorization) {
-      throw new UnauthorizedError(
-        "RESOURCE_BLOCKED",
-        "You are unauthorized to access this resource",
-      );
+      throw new UnauthorizedError();
     }
 
     const [type, token] = authorization.split(" ");
 
     if (type !== "Bearer" || !token) {
-      throw new UnauthorizedError(
-        "RESOURCE_BLOCKED",
-        "You are unauthorized to access this resource",
-      );
+      throw new UnauthorizedError();
     }
 
     const { payload } = await verifyAccessToken(token);
 
     if (!payload) {
-      throw new UnauthorizedError(
-        "RESOURCE_BLOCKED",
-        "You are unauthorized to access this resource",
-      );
+      throw new UnauthorizedError();
     }
 
     if (payload.type !== "access-token" || !payload.sub || !payload.sid) {
-      throw new UnauthorizedError(
-        "INVALID_TOKEN",
-        "Invalid authentication token",
-      );
+      throw new UnauthorizedError();
     }
 
     const userId = payload.sub;
@@ -59,11 +46,13 @@ export default async function authMiddleware(
     });
 
     if (!session) {
-      throw new UnauthorizedError(
-        "RESOURCE_BLOCKED",
-        "You are unauthorized to access this resource",
-      );
+      throw new UnauthorizedError();
     }
+
+    req.auth = {
+      userId,
+      sessionId: sessionId as string,
+    };
 
     next();
   } catch (error) {
