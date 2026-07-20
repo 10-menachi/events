@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import logger from "../lib/logger";
 import AppError from "../errors/app.error";
 import { ZodError } from "zod";
+import { JWTExpired } from "jose/errors";
 
 export function errorHandler(
   err: Error,
@@ -26,6 +27,13 @@ export function errorHandler(
         path: issue.path.join("."),
         message: issue.message,
       })),
+    });
+  }
+
+  if (err instanceof JWTExpired) {
+    return res.status(401).json({
+      code: "TOKEN_EXPIRED",
+      message: "Your session has expired",
     });
   }
 

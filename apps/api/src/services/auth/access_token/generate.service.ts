@@ -5,7 +5,7 @@ export default async function generateAccessToken(
   userId: string,
   sessionId: string,
 ) {
-  return await new SignJWT({ sid: sessionId })
+  return await new SignJWT({ sid: sessionId, type: "access-token" })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setSubject(userId)
     .setIssuedAt()
