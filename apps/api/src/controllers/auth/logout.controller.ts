@@ -16,7 +16,7 @@ export default async function logoutUserController(
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      path: "/api/auth",
+      path: "/api",
     });
 
     return res.status(204).send();

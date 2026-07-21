@@ -13,8 +13,6 @@ export default async function refreshAccessTokenController(
   try {
     const refreshToken = req.cookies.refreshToken;
 
-    logger.info(`TUKUN: ${refreshToken}`);
-
     if (!refreshToken) {
       throw new UnauthorizedError();
     }
@@ -35,7 +33,7 @@ export default async function refreshAccessTokenController(
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      path: "/api/auth",
+      path: "/api",
     });
 
     res.cookie(
@@ -45,7 +43,7 @@ export default async function refreshAccessTokenController(
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        path: "/api/auth",
+        path: "/api",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       },
     );

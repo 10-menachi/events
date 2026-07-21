@@ -19,7 +19,7 @@ export default async function loginUserController(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      path: "/api/auth",
+      path: "/api",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
