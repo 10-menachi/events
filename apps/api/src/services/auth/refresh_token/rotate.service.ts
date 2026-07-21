@@ -8,38 +8,47 @@ export default async function rotateRefreshTokenService(
   refreshTokenId: string,
   secret: string,
 ) {
-  const oldDbToken = await prisma.refreshToken.findUnique({
-    where: {
-      id: refreshTokenId,
-      session: {
-        id: sessionId,
+  return prisma.$transaction(async (tx) => {
+    const oldDbToken = await tx.refreshToken.findUnique({
+      where: {
+        id: refreshTokenId,
       },
-    },
-  });
-
-  if (!oldDbToken) {
-    throw new UnauthorizedError();
-  }
-
-  const isSecretValid = await verifyPassword(secret, oldDbToken.tokenHash);
-
-  if (!isSecretValid) {
-    throw new UnauthorizedError();
-  }
-
-  await prisma.refreshToken.update({
-    where: {
-      id: refreshTokenId,
-      session: {
-        id: sessionId,
+      include: {
+        session: true,
       },
-    },
-    data: {
-      revokedAt: new Date(),
-    },
+    });
+
+    if (!oldDbToken) {
+      throw new UnauthorizedError();
+    }
+
+    if (!oldDbToken.session || oldDbToken.session.id !== sessionId) {
+      throw new UnauthorizedError();
+    }
+
+    if (oldDbToken.revokedAt) {
+      throw new UnauthorizedError();
+    }
+
+    if (oldDbToken.expiresAt < new Date()) {
+      throw new UnauthorizedError();
+    }
+
+    const isSecretValid = await verifyPassword(secret, oldDbToken.tokenHash);
+
+    if (!isSecretValid) {
+      throw new UnauthorizedError();
+    }
+
+    await tx.refreshToken.update({
+      where: {
+        id: refreshTokenId,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+
+    return generateRefreshToken(sessionId, tx);
   });
-
-  const newDbToken = await generateRefreshToken(sessionId);
-
-  return newDbToken;
 }

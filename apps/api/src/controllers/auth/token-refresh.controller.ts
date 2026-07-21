@@ -1,8 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import refreshTokenService from "../../services/auth/access_token/refresh.service";
 import UnauthorizedError from "../../errors/unauthorized.error";
+import refreshTokenService from "../../services/auth/access_token/refresh.service";
 import generateAccessTokenService from "../../services/auth/access_token/generate.service";
-import logger from "../../lib/logger";
 import rotateRefreshTokenService from "../../services/auth/refresh_token/rotate.service";
 
 export default async function refreshAccessTokenController(
@@ -19,9 +18,11 @@ export default async function refreshAccessTokenController(
 
     const [id, secret] = refreshToken.split(".");
 
-    const { userId, sessionId } = await refreshTokenService(id, secret);
+    if (!id || !secret) {
+      throw new UnauthorizedError();
+    }
 
-    const accessToken = await generateAccessTokenService(userId, sessionId);
+    const { userId, sessionId } = await refreshTokenService(id, secret);
 
     const newRefreshToken = await rotateRefreshTokenService(
       sessionId,
@@ -29,9 +30,11 @@ export default async function refreshAccessTokenController(
       secret,
     );
 
+    const accessToken = await generateAccessTokenService(userId, sessionId);
+
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/api",
     });
@@ -42,13 +45,15 @@ export default async function refreshAccessTokenController(
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "strict",
         path: "/api",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       },
     );
 
-    return res.status(200).json({ accessToken });
+    return res.status(200).json({
+      accessToken,
+    });
   } catch (error) {
     next(error);
   }

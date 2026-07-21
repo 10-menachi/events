@@ -18,7 +18,7 @@ export default async function loginUserController(
     res.cookie("refreshToken", `${refreshTokenId}.${refreshTokenHash}`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "strict",
       path: "/api",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
