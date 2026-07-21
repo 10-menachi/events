@@ -2,7 +2,7 @@ import { InvalidCredentialsError } from "../../errors/auth.errors";
 import prisma from "../../lib/prisma";
 import { verifyPassword } from "../../providers/auth/password.provider";
 import type { LoginInput } from "../../schemas/auth/login.schema";
-import generateAccessToken from "./access_token/generate.service";
+import generateAccessTokenService from "./access_token/generate.service";
 import { generateRefreshToken } from "./refresh_token/generate.service";
 import createSessionService from "./session/create.service";
 
@@ -51,7 +51,7 @@ export default async function loginUserService(input: LoginInput) {
   const { refreshToken: refreshTokenHash, refreshTokenId } =
     await generateRefreshToken(session.id);
 
-  const accessToken = await generateAccessToken(user.id, session.id);
+  const accessToken = await generateAccessTokenService(user.id, session.id);
 
   return {
     user,

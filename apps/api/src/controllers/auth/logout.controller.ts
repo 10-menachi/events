@@ -12,6 +12,13 @@ export default async function logoutUserController(
 
     await revokeSessionService(userId, sessionId);
 
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      path: "/api/auth",
+    });
+
     return res.status(204).send();
   } catch (error) {
     next(error);

@@ -1,7 +1,7 @@
 import { SignJWT } from "jose";
 import { env } from "../../../config";
 
-export default async function generateAccessToken(
+export default async function generateAccessTokenService(
   userId: string,
   sessionId: string,
 ) {
