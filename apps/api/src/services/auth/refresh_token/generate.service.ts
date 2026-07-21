@@ -8,7 +8,7 @@ export async function generateRefreshToken(sessionId: string) {
   const refreshToken = randomBytes(64).toString("hex");
   const refreshTokenHash = await hashPassword(refreshToken);
 
-  await prisma.refreshToken.create({
+  const dbToken = await prisma.refreshToken.create({
     data: {
       sessionId,
       tokenHash: refreshTokenHash,
@@ -16,5 +16,5 @@ export async function generateRefreshToken(sessionId: string) {
     },
   });
 
-  return refreshToken;
+  return { refreshToken, refreshTokenId: dbToken.id };
 }

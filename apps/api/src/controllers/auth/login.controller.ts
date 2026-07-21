@@ -7,13 +7,19 @@ export default async function loginUserController(
   next: NextFunction,
 ) {
   try {
-    const { user, emailIdentity, accessToken, refreshTokenHash } =
-      await loginUserService(req.body);
+    const {
+      user,
+      emailIdentity,
+      accessToken,
+      refreshTokenHash,
+      refreshTokenId,
+    } = await loginUserService(req.body);
 
-    res.cookie("refreshToken", refreshTokenHash, {
+    res.cookie("refreshToken", `${refreshTokenId}.${refreshTokenHash}`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      path: "/api/auth",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 

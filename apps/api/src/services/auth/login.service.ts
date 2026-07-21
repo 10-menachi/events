@@ -48,7 +48,8 @@ export default async function loginUserService(input: LoginInput) {
 
   const session = await createSessionService(user.id);
 
-  const refreshTokenHash = await generateRefreshToken(session.id);
+  const { refreshToken: refreshTokenHash, refreshTokenId } =
+    await generateRefreshToken(session.id);
 
   const accessToken = await generateAccessToken(user.id, session.id);
 
@@ -56,6 +57,7 @@ export default async function loginUserService(input: LoginInput) {
     user,
     emailIdentity: existingEmailIdentity,
     refreshTokenHash,
+    refreshTokenId,
     accessToken,
   };
 }
