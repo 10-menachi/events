@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
 import app from "../../../src/app";
 import { resetDatabase } from "../../setup/database";
+import logger from "../../../src/lib/logger";
 
 const validRegistrationPayload = {
   fullName: "Wamalwa Christian Timbe",
@@ -95,5 +96,58 @@ describe("Registration Tests", () => {
       path: "password",
       message: "Password is required",
     });
+  });
+
+  it("should reject login with missing email and password", async () => {
+    const response = await request(app).post("/api/auth/login").send({});
+
+    expect(response.status).toBe(400);
+
+    expect(response.body.code).toBe("VALIDATION_ERROR");
+
+    expect(response.body.errors).toContainEqual({
+      path: "email",
+      message: "Email is required",
+    });
+
+    expect(response.body.errors).toContainEqual({
+      path: "password",
+      message: "Password is required",
+    });
+  });
+
+  it("should reject login with invalid email", async () => {
+    const response = await request(app).post("/api/auth/login").send({
+      email: "invalid-email",
+      password: "password123",
+    });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body.code).toBe("VALIDATION_ERROR");
+
+    expect(response.body.errors).toContainEqual({
+      path: "email",
+      message: "Invalid email address",
+    });
+  });
+
+  it("should test that the refresh cookie is set after login", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send(validRegistrationPayload);
+
+    const response = await request(app).post("/api/auth/login").send({
+      email: validRegistrationPayload.email,
+      password: validRegistrationPayload.password,
+    });
+
+    expect(response.headers["set-cookie"]).toBeDefined();
+
+    const cookies = response.headers["set-cookie"];
+
+    expect(cookies).toEqual(
+      expect.arrayContaining([expect.stringContaining("refreshToken=")]),
+    );
   });
 });
