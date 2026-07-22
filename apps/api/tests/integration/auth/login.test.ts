@@ -31,6 +31,7 @@ describe("Registration Tests", () => {
       id: expect.any(String),
       fullName: validRegistrationPayload.fullName,
       email: validRegistrationPayload.email,
+      accessToken: expect.any(String),
     });
   });
 

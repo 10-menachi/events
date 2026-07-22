@@ -13,6 +13,7 @@ export default defineConfig({
       NODE_ENV: "test",
       DATABASE_URL: process.env.DATABASE_URL ?? "",
     },
+    globalSetup: "./tests/setup/global.ts",
     maxWorkers: 1,
   },
 });
