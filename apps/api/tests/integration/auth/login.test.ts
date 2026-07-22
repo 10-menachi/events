@@ -3,6 +3,7 @@ import request from "supertest";
 import app from "../../../src/app";
 import { resetDatabase } from "../../setup/database";
 import logger from "../../../src/lib/logger";
+import prisma from "../../../src/lib/prisma";
 
 const validRegistrationPayload = {
   fullName: "Wamalwa Christian Timbe",
@@ -149,5 +150,25 @@ describe("Registration Tests", () => {
     expect(cookies).toEqual(
       expect.arrayContaining([expect.stringContaining("refreshToken=")]),
     );
+  });
+
+  it("should test that a session is created when a user logs in", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send(validRegistrationPayload);
+
+    const response = await request(app).post("/api/auth/login").send({
+      email: validRegistrationPayload.email,
+      password: validRegistrationPayload.password,
+    });
+
+    const session = await prisma.session.findFirst({
+      where: {
+        userId: response.body.id,
+      },
+    });
+
+    expect(session).not.toBeNull();
+    expect(session!.revokedAt).toBeNull();
   });
 });
