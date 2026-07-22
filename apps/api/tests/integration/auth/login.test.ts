@@ -66,7 +66,22 @@ describe("Registration Tests", () => {
     });
   });
 
-  it("should reject login with missing fields", async () => {
+  it("should reject login with missing email", async () => {
+    const response = await request(app).post("/api/auth/login").send({
+      password: validRegistrationPayload.password,
+    });
+
+    expect(response.status).toBe(400);
+
+    expect(response.body.code).toBe("VALIDATION_ERROR");
+
+    expect(response.body.errors).toContainEqual({
+      path: "email",
+      message: "Email is required",
+    });
+  });
+
+  it("should reject login with missing password", async () => {
     const response = await request(app).post("/api/auth/login").send({
       email: validRegistrationPayload.email,
     });
