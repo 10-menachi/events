@@ -171,4 +171,35 @@ describe("Registration Tests", () => {
     expect(session).not.toBeNull();
     expect(session!.revokedAt).toBeNull();
   });
+
+  it("should test that a refresh token is created when a user logs in", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send(validRegistrationPayload);
+
+    const response = await request(app).post("/api/auth/login").send({
+      email: validRegistrationPayload.email,
+      password: validRegistrationPayload.password,
+    });
+
+    const session = await prisma.session.findFirst({
+      where: {
+        userId: response.body.id,
+      },
+    });
+
+    const refreshToken = await prisma.refreshToken.findFirst({
+      where: {
+        session: {
+          id: session!.id,
+          userId: response.body.id,
+        },
+      },
+    });
+
+    expect(session).not.toBeNull();
+    expect(session!.revokedAt).toBeNull();
+    expect(refreshToken).not.toBeNull();
+    expect(refreshToken!.revokedAt).toBeNull();
+  });
 });
