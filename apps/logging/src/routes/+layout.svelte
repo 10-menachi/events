@@ -1,31 +1,28 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import favicon from '$lib/assets/favicon.svg';
-	import { initializeAuth, isLoading, isLoggedIn, login, user } from '../stores/auth';
+	import { initializeAuth, isAuthenticated, isLoading, isLoggedIn, login } from '../stores/auth';
+	import Loading from '../components/Loading.svelte';
 	import { get } from 'svelte/store';
 
 	let { children } = $props();
 
 	onMount(async () => {
-		isLoading.set(true);
-
 		await initializeAuth();
 
-		const isCallbackRoute =
-			window.location.pathname === '/auth/callback' || window.location.search.includes('code=');
-		const authenticated = get(isLoggedIn);
-		const hasUser = Boolean(get(user));
+		console.log('LOGUDIN', get(isLoggedIn));
 
-		if (!authenticated && !hasUser && !isCallbackRoute) {
+		if (!get(isLoggedIn)) {
 			await login();
 		}
-
-		isLoading.set(false);
 	});
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<title>Logging Dashboard</title>
 </svelte:head>
 
-{@render children()}
+{#if $isLoading}
+	<Loading />
+{:else}
+	{@render children()}
+{/if}

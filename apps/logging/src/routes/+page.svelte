@@ -1,11 +1,13 @@
 <script lang="ts">
-	import Progress from '../components/progress.svelte';
-	import LogsView from '../components/logs-view.svelte';
-	import { isLoading } from '../stores/auth';
+	import { isLoading, user } from '../stores/auth';
+	import Loading from '../components/Loading.svelte';
+	import LogsView from '../components/LogsView.svelte';
 </script>
 
-{#if isLoading}
-	<Progress />
+{#if $isLoading}
+	<Loading />
+{:else if $user}
+	<LogsView />
+{:else}
+	<p>No user loaded yet.</p>
 {/if}
-
-<LogsView />

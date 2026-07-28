@@ -1,22 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { initializeAuth, isLoading } from '../../../stores/auth';
-	import Progress from '../../../components/progress.svelte';
+	import { handleCallback } from '../../../stores/auth';
+	import Loading from '../../../components/Loading.svelte';
 
 	onMount(async () => {
-		isLoading.set(true);
-
 		try {
-			await initializeAuth();
+			await handleCallback();
+
 			await goto('/');
-		} catch (error) {
-			console.error('Callback handling failed:', error);
-			await goto('/');
-		} finally {
-			isLoading.set(false);
+		} catch (err) {
+			console.error('CALLBACK ERROR:', err);
 		}
 	});
 </script>
 
-<Progress />
+<Loading />

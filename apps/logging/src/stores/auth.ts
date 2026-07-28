@@ -4,11 +4,10 @@ import { browser } from '$app/environment';
 
 export const auth0Client = writable<Auth0Client | null>(null);
 export const user = writable<User | null>(null);
-export const isAuthenticated = writable<boolean>(false);
-export const isLoading = writable<boolean>(true);
+export const isAuthenticated = writable(false);
+export const isLoading = writable(true);
 export const error = writable<string | null>(null);
 
-// Derived stores
 export const isLoggedIn: Readable<boolean> = derived(
 	[isAuthenticated, isLoading],
 	([$isAuthenticated, $isLoading]) => $isAuthenticated && !$isLoading
@@ -21,63 +20,95 @@ function getRedirectUri() {
 export async function initializeAuth() {
 	if (!browser) return;
 
+	isLoading.set(true);
+
 	try {
-		const client = await createAuth0Client({
-			domain: import.meta.env.VITE_AUTH0_DOMAIN,
-			clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
-			authorizationParams: {
-				redirect_uri: getRedirectUri()
-			},
-			useRefreshTokens: true,
-			cacheLocation: 'localstorage'
-		});
+		let client = get(auth0Client);
 
-		auth0Client.set(client);
+		if (!client) {
+			client = await createAuth0Client({
+				domain: import.meta.env.VITE_AUTH0_DOMAIN,
+				clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
+				authorizationParams: {
+					redirect_uri: getRedirectUri()
+				},
+				useRefreshTokens: true,
+				cacheLocation: 'localstorage',
+				useCookiesForTransactions: true
+			});
 
-		const isCallbackRoute =
-			window.location.pathname === '/auth/callback' || window.location.search.includes('code=');
-
-		// Handle callback
-		if (isCallbackRoute) {
-			await client.handleRedirectCallback();
-			window.history.replaceState({}, document.title, window.location.pathname);
+			auth0Client.set(client);
 		}
 
-		// Check authentication status
-		const userData = await client.getUser();
-		const authenticated = (await client.isAuthenticated()) || Boolean(userData);
+		const authenticated = await client.isAuthenticated();
+
 		isAuthenticated.set(authenticated);
-		user.set(userData || null);
+
+		console.log('AUTHENTICATED:', authenticated);
+
+		const userData = await client.getUser();
+
+		console.log('USER DATA:', userData);
+
+		if (authenticated) {
+			user.set((await client.getUser()) ?? null);
+		} else {
+			user.set(null);
+		}
 
 		error.set(null);
 	} catch (err) {
-		console.error('Auth initialization error:', err);
+		console.error(err);
+
 		error.set(err instanceof Error ? err.message : 'Authentication initialization failed');
 	} finally {
 		isLoading.set(false);
 	}
 }
 
+export async function handleCallback() {
+	const client = get(auth0Client);
+
+	if (!client) {
+		throw new Error('Auth0 client has not been initialized.');
+	}
+
+	await client.handleRedirectCallback();
+
+	const authenticated = await client.isAuthenticated();
+
+	isAuthenticated.set(authenticated);
+
+	if (authenticated) {
+		user.set((await client.getUser()) ?? null);
+	}
+}
+
 export async function login() {
 	const client = get(auth0Client);
-	if (client) {
-		await client.loginWithRedirect();
+
+	if (!client) {
+		throw new Error('Auth0 client has not been initialized.');
 	}
+
+	await client.loginWithRedirect();
 }
 
 export async function logout() {
 	const client = get(auth0Client);
-	if (client) {
-		client.logout({
-			logoutParams: {
-				returnTo: window.location.origin
-			}
-		});
-	}
+
+	if (!client) return;
+
+	client.logout({
+		logoutParams: {
+			returnTo: window.location.origin
+		}
+	});
 }
 
 export async function getToken(): Promise<string | null> {
 	const client = get(auth0Client);
+
 	if (!client) return null;
 
 	try {
@@ -86,6 +117,7 @@ export async function getToken(): Promise<string | null> {
 		if (err.error === 'login_required') {
 			await login();
 		}
+
 		return null;
 	}
 }
