@@ -1,2 +1,11 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+	import Progress from '../components/progress.svelte';
+	import LogsView from '../components/logs-view.svelte';
+	import { isLoading } from '../stores/auth';
+</script>
+
+{#if isLoading}
+	<Progress />
+{/if}
+
+<LogsView />
