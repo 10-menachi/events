@@ -1,24 +1,24 @@
 <script lang="ts">
+	import '../app.css';
 	import { onMount } from 'svelte';
-	import { initializeAuth, isAuthenticated, isLoading, isLoggedIn, login } from '../stores/auth';
+	import { initializeAuth, isLoading } from '../stores/auth';
 	import Loading from '../components/Loading.svelte';
-	import { get } from 'svelte/store';
 
 	let { children } = $props();
 
 	onMount(async () => {
-		await initializeAuth();
-
-		console.log('LOGUDIN', get(isLoggedIn));
-
-		if (!get(isLoggedIn)) {
-			await login();
+		try {
+			await initializeAuth();
+		} catch (error) {
+			console.error('Auth initialization failed:', error);
+		} finally {
+			isLoading.set(false);
 		}
 	});
 </script>
 
 <svelte:head>
-	<title>Logging Dashboard</title>
+	<title>Logs Visualizer</title>
 </svelte:head>
 
 {#if $isLoading}

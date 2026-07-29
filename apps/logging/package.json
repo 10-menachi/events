@@ -38,6 +38,7 @@
 	},
 	"dependencies": {
 		"@auth0/auth0-spa-js": "^2.24.0",
+		"@lucide/svelte": "^1.27.0",
 		"@tailwindcss/vite": "^4.3.3",
 		"tailwindcss": "^4.3.3"
 	}
