@@ -1,0 +1,32 @@
+<script lang="ts">
+	const tableData = [
+		{ first: 'Liam', last: 'Steele', email: 'liam@email.com' },
+		{ first: 'Athena', last: 'Marks', email: 'athena@email.com' },
+		{ first: 'Angela', last: 'Rivers', email: 'angela@email.com' }
+	];
+</script>
+
+<div class="table-wrap">
+	<table class="table caption-bottom">
+		<thead>
+			<tr>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Email</th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each tableData as row}
+				<tr>
+					<td>{row.first}</td>
+					<td>{row.last}</td>
+					<td>{row.email}</td>
+					<td class="text-right">
+						<a class="btn btn-xs preset-tonal" href="#">View &rarr;</a>
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+</div>
